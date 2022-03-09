@@ -9,7 +9,6 @@ export default class Song extends Model implements SongModel {
 	public title!: string;
 	public duration!: number;
 	public thumbnailURL!: string;
-	public quequeNumber!: number;
 
 	static get tableName() {
 		return "songs";
@@ -29,7 +28,6 @@ class SongValidator extends Validator {
 			title: Joi.string().required(),
 			duration: Joi.number().required(),
 			thumbnailURL: Joi.string().required(),
-			quequeNumber: Joi.number().required(),
 		});
 		const validate = schema.validate(data);
 		if (validate.error) throw new ValidationError(validate.error.details[0].message);

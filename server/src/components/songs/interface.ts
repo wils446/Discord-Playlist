@@ -4,5 +4,11 @@ export interface SongModel {
 	title: string;
 	duration: number;
 	thumbnailURL: string;
-	quequeNumber: number;
+}
+
+export interface ICreateSongDTO {
+	title: string;
+	URL: string;
+	duration: number;
+	thumbnailURL: string;
 }
