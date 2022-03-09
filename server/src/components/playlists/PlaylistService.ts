@@ -1,4 +1,5 @@
 import { NotFoundError } from "../../libs/errors";
+import PlaylistSong from "../playlistSong/PlaylistSongModel";
 import Playlist from "./PlaylistModel";
 
 export default class PlaylistService {
@@ -40,5 +41,13 @@ export default class PlaylistService {
 			createdBy: playlist.createdBy,
 			createdAt: playlist.createdAt,
 		});
+	}
+
+	async addSongToPlaylist(playlistId: number, songId: number): Promise<void> {
+		await PlaylistSong.query().insert({ playlistId, songId });
+	}
+
+	async removeSongFromPlaylist(playlistId: number, songId: number): Promise<void> {
+		await PlaylistSong.query().delete().where({ playlistId, songId });
 	}
 }
