@@ -44,7 +44,10 @@ export default class PlaylistService {
 	}
 
 	async addSongToPlaylist(playlistId: number, songId: number): Promise<void> {
-		await PlaylistSong.query().insert({ playlistId, songId });
+		const playlistSong = await PlaylistSong.query().select().where({ playlistId, songId });
+		const queueNumber = playlistSong.length + 1;
+
+		await PlaylistSong.query().insert({ playlistId, songId, queueNumber });
 	}
 
 	async removeSongFromPlaylist(playlistId: number, songId: number): Promise<void> {
