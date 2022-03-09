@@ -5,7 +5,6 @@ import { SongModel } from "./interface";
 
 export default class Song extends Model implements SongModel {
 	public id!: number;
-	public playlistId!: number;
 	public URL!: string;
 	public title!: string;
 	public duration!: number;
@@ -26,7 +25,6 @@ class SongValidator extends Validator {
 		const data = args.json;
 
 		const schema = Joi.object({
-			playlistId: Joi.number().required(),
 			URL: Joi.string().required(),
 			title: Joi.string().required(),
 			duration: Joi.number().required(),
