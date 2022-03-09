@@ -2,7 +2,7 @@ import { UserRequestResponse } from "../auth/interface";
 import User from "./UserModel";
 
 export default class UserService {
-	async createUser(user: UserRequestResponse): Promise<number> {
+	async createUser(user: UserRequestResponse): Promise<User> {
 		const newUser = await User.query().insert({
 			name: user.username,
 			discordId: user.id,
@@ -10,7 +10,7 @@ export default class UserService {
 			avatarURL: user.avatar,
 		});
 
-		return newUser.id;
+		return newUser;
 	}
 
 	async getUserById(id: number): Promise<User | undefined> {

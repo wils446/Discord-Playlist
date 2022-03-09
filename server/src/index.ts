@@ -10,9 +10,12 @@ async function main() {
 
 	const { config } = await import("./core/config");
 	const { default: passport } = await import("./core/passport");
+	const { authRoute } = await import("./app/controllers");
 	await import("./core/db");
 
 	app.use(passport.initialize());
+
+	app.use("/auth", authRoute);
 
 	app.use(errorHandler);
 
