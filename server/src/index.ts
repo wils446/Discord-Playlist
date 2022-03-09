@@ -9,7 +9,10 @@ async function main() {
 	app.use(Express.json());
 
 	const { config } = await import("./core/config");
+	const { default: passport } = await import("./core/passport");
 	await import("./core/db");
+
+	app.use(passport.initialize());
 
 	app.use(errorHandler);
 
