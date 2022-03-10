@@ -25,8 +25,15 @@ export default class PlaylistService {
 
 	async deletePlaylist(playlistId: number): Promise<void> {
 		const playlist = await Playlist.query().findById(playlistId);
+		const playlistSong = await PlaylistSong.query().select().where({ playlistId });
 
 		if (!playlist) throw new NotFoundError("Playlist not found");
+
+		await Promise.all([
+			...playlistSong.map((p) => {
+				PlaylistSong.query().delete().where({ playlistId: p.playlistId, songId: p.songId });
+			}),
+		]);
 
 		await Playlist.query().deleteById(playlistId);
 	}
@@ -43,8 +50,14 @@ export default class PlaylistService {
 		});
 	}
 
+	async searchPlaylist(search: string): Promise<Playlist[]> {
+		const playlists = await Playlist.query().where("name", "like", `%${search}%`);
+
+		return playlists;
+	}
+
 	async addSongToPlaylist(playlistId: number, songId: number): Promise<void> {
-		const playlistSong = await PlaylistSong.query().select().where({ playlistId, songId });
+		const playlistSong = await PlaylistSong.query().select().where({ playlistId });
 		const queueNumber = playlistSong.length + 1;
 
 		await PlaylistSong.query().insert({ playlistId, songId, queueNumber });
