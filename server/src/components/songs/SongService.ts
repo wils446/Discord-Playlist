@@ -13,21 +13,31 @@ export default class SongService {
 	}
 
 	async getSongFromPlaylist(playlistId: number): Promise<Song[]> {
-		const song = await Song.query().select().where({ playlistId });
+		const playlistSongs = await PlaylistSong.query().select().where({ playlistId }).orderBy("queueNumber");
 
-		if (!song) throw new NotFoundError("Song not found");
+		if (!playlistSongs) throw new NotFoundError("Song not found");
 
-		return song;
+		const songs = await Promise.all([...playlistSongs.map(({ songId }) => Song.query().findById(songId))]);
+
+		return (songs as Song[]) || [];
 	}
 
 	async addSong(songData: ICreateSongDTO): Promise<number> {
-		let song = await Song.query().where({ URL: songData.URL, title: songData.title }).first();
+		let song = await Song.query().findOne({ title: songData.title, URL: songData.URL });
 		if (!song) song = await Song.query().insert(songData);
 
 		return song.id;
 	}
 
-	async updateSongQueue(playlistId: number, songId: number, queue: number) {
+	//if queue is undefined, it will be the last song in the queue
+	async updateSongQueue(playlistId: number, songId: number, queue?: number) {
+		if (queue === 0) return;
+
+		if (!queue) {
+			const playlistSongs = await this.getSongFromPlaylist(playlistId);
+			queue = playlistSongs.length;
+		}
+
 		const song = await PlaylistSong.query().select().where({ songId, playlistId }).first();
 
 		if (!song) throw new NotFoundError("Song not found");
@@ -35,15 +45,19 @@ export default class SongService {
 		const songs = await PlaylistSong.query()
 			.select()
 			.where({ playlistId })
-			.where("queueNumber", ">=", queue)
-			.where("queueNumber", "<", song.queueNumber);
+			.where("queueNumber", song.queueNumber > queue ? ">=" : "<=", queue)
+			.where("queueNumber", song.queueNumber > queue ? "<" : ">", song.queueNumber);
 
 		await Promise.all([
-			...songs.map(({ songId, queueNumber, playlistId }) => {
+			...songs.map(({ songId, queueNumber, playlistId }) =>
 				PlaylistSong.query()
-					.patch({ songId, playlistId, queueNumber: queueNumber + 1 })
-					.where({ songId, playlistId });
-			}),
+					.patch({
+						songId,
+						playlistId,
+						queueNumber: song.queueNumber > queue! ? queueNumber + 1 : queueNumber - 1,
+					})
+					.where({ songId, playlistId })
+			),
 		]);
 
 		await PlaylistSong.query()
