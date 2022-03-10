@@ -5,15 +5,11 @@ Backend Routes documentation.
 
 ## Authentication
 
----
-
 ### 1. Get User Data
 
 > `GET localhost:PORT/auth?code=`
 
 ## Playlists
-
----
 
 ### 1. Get Playlist By Id
 
@@ -22,6 +18,10 @@ Backend Routes documentation.
 ### 2. Get Random Playlist
 
 > `GET localhost:PORT/playlists/`
+
+### 3. Search Playlist
+
+> `GET localhost:PORT/playlists?search=
 
 ### 3. Create Playlist
 
