@@ -1,9 +1,12 @@
 import { NotFoundError } from "../../libs/errors";
 import PlaylistSong from "../playlistSong/PlaylistSongModel";
+import { Client, Video } from "youtubei";
 import { ICreateSongDTO } from "./interface";
 import Song from "./SongModel";
 
 export default class SongService {
+	private youtubeiClient = new Client();
+
 	async getSongById(songId: number): Promise<Song> {
 		const song = await Song.query().findById(songId);
 
@@ -63,5 +66,13 @@ export default class SongService {
 		await PlaylistSong.query()
 			.patch({ songId: song.songId, playlistId: song.playlistId, queueNumber: queue })
 			.where({ songId, playlistId });
+	}
+
+	async getSongInfoByURL(URL: string): Promise<Video> {
+		const songInfo = await this.youtubeiClient.getVideo<Video>(URL);
+
+		if (!songInfo) throw new NotFoundError("Song not found");
+
+		return songInfo;
 	}
 }
