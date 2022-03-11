@@ -1,14 +1,16 @@
-import { RequestHandler } from "express";
+import { SuperRequestHandler } from "../../../@types/SuperRequestHandler";
 import { AuthService, UserService } from "../../../components";
 
-export const discordOAuth: RequestHandler = async (req, res, next) => {
+type Query = { code: string };
+
+export const discordOAuth: SuperRequestHandler<{ query: Query }> = async (req, res, next) => {
 	try {
 		const { code } = req.query;
 
 		const auth = new AuthService();
 		const userService = new UserService();
 
-		const accessToken = await auth.getAccessToken(code as string);
+		const accessToken = await auth.getAccessToken(code);
 		const userDiscord = await auth.getUserInfo(accessToken.access_token);
 
 		let user = await userService.getUserByDiscordId(userDiscord.id);
