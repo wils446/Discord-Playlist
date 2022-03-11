@@ -10,13 +10,14 @@ async function main() {
 
 	const { config } = await import("./core/config");
 	const { default: passport } = await import("./core/passport");
-	const { authRoute, playlistRoute } = await import("./app/controllers");
+	const { authRoute, playlistRoute, songRoute } = await import("./app/controllers");
 	await import("./core/db");
 
 	app.use(passport.initialize());
 
 	app.use("/auth", authRoute);
 	app.use("/playlists", playlistRoute);
+	app.use("/songs", songRoute);
 
 	app.use(errorHandler);
 
